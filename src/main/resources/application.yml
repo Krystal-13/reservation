@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: reservation
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+      use-new-id-generator-mappings: false
+    show-sql: true
+    defer-datasource-initialization: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/project?serverTimezone=UTC&characterEncoding=UTF-8
+    username: reservation
+    password: reservation
+
+  jwt:
+    secret: ${SECRET_KEY}
