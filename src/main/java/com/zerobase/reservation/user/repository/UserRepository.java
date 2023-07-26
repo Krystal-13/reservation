@@ -1,7 +1,6 @@
-package com.zerobase.reservation.repository;
+package com.zerobase.reservation.user.repository;
 
-import com.zerobase.reservation.domain.User;
-import com.zerobase.reservation.dto.UserDto;
+import com.zerobase.reservation.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

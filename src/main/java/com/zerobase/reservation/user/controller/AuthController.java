@@ -1,9 +1,9 @@
-package com.zerobase.reservation.controller;
+package com.zerobase.reservation.user.controller;
 
 
-import com.zerobase.reservation.dto.UserDto;
+import com.zerobase.reservation.user.dto.UserDto;
 import com.zerobase.reservation.security.TokenProvider;
-import com.zerobase.reservation.service.UserService;
+import com.zerobase.reservation.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +24,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody UserDto request) {
         UserDto user = userService.register(request);
+
         return ResponseEntity.ok(user);
     }
 
@@ -31,7 +32,8 @@ public class AuthController {
     public ResponseEntity<?> signin(@RequestBody UserDto request) {
         UserDto user = userService.authenticate(request);
         String token = tokenProvider
-                .generateToken(user.getId(), user.getRoles());
+                .generateToken(user.getEmail(), user.getRoles());
+
         return ResponseEntity.ok(token);
     }
 }

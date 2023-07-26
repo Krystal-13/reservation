@@ -1,6 +1,6 @@
-package com.zerobase.reservation.domain;
+package com.zerobase.reservation.user.entity;
 
-import com.zerobase.reservation.type.Role;
+import com.zerobase.reservation.user.type.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,9 +21,10 @@ public class User {
     private Long id;
 
     private String email;
-    private String name;
+    private String username;
     private String password;
     private String phone;
+    @Enumerated(EnumType.STRING)
     private Role roles;
 
 

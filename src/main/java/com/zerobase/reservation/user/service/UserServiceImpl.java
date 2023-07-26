@@ -1,15 +1,13 @@
-package com.zerobase.reservation.service;
+package com.zerobase.reservation.user.service;
 
-import com.zerobase.reservation.domain.User;
-import com.zerobase.reservation.dto.UserDto;
-import com.zerobase.reservation.repository.UserRepository;
-import com.zerobase.reservation.type.Role;
+import com.zerobase.reservation.user.entity.User;
+import com.zerobase.reservation.user.dto.UserDto;
+import com.zerobase.reservation.user.repository.UserRepository;
+import com.zerobase.reservation.user.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +29,7 @@ public class UserServiceImpl implements UserService{
         User user = User.builder()
                 .email(request.getEmail())
                 .password(encPassword)
-                .name(request.getName())
+                .username(request.getName())
                 .phone(request.getPhone())
                 .roles(Role.USER)
                 .build();
@@ -42,6 +40,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserDto authenticate(UserDto request) {
+        // 인증키 발급이 되어야 (로그인이 되어야) 예약가능
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("error class 만들기!!!!!!!"));
 

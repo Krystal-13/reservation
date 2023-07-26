@@ -1,7 +1,7 @@
-package com.zerobase.reservation.dto;
+package com.zerobase.reservation.user.dto;
 
-import com.zerobase.reservation.domain.User;
-import com.zerobase.reservation.type.Role;
+import com.zerobase.reservation.user.entity.User;
+import com.zerobase.reservation.user.type.Role;
 import lombok.*;
 
 @Getter
@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserDto{
     private Long id;
     private String email;
     private String name;
@@ -22,9 +22,10 @@ public class UserDto {
         return UserDto.builder()
                 .email(user.getEmail())
                 .password(user.getPassword())
-                .name(user.getName())
+                .name(user.getUsername())
                 .phone(user.getPhone())
                 .roles(user.getRoles())
                 .build();
     }
+
 }

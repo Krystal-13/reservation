@@ -1,4 +1,4 @@
-package com.zerobase.reservation.type;
+package com.zerobase.reservation.user.type;
 
 import lombok.Getter;
 
@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum Role {
     USER,
     MANAGER,
-    ADMIN;
+    ADMIN
 //
 //    private final String role;
 //
