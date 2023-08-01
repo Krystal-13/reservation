@@ -38,6 +38,10 @@ public class RestaurantServiceImpl implements RestaurantService{
         }
 
         User user = optionalUser.get();
+        if (!user.getRoles().equals(Role.MANAGER)) {
+            throw new CustomException(USER_NOT_PARTNER);
+        }
+
         Optional<Restaurant> optionalRestaurant =
                         restaurantRepository.findById(user.getId());
 

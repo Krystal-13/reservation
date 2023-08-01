@@ -2,11 +2,6 @@ spring:
   application:
     name: reservation
 
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-
   jpa:
     hibernate:
       ddl-auto: validate

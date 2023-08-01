@@ -2,7 +2,6 @@ package com.zerobase.reservation.security;
 
 import com.zerobase.reservation.user.entity.User;
 import com.zerobase.reservation.user.repository.UserRepository;
-import com.zerobase.reservation.user.type.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

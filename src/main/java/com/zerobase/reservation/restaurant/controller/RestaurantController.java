@@ -3,12 +3,10 @@ package com.zerobase.reservation.restaurant.controller;
 import com.zerobase.reservation.restaurant.dto.RestaurantDto;
 import com.zerobase.reservation.restaurant.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/restaurant")

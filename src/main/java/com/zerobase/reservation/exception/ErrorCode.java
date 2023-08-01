@@ -2,21 +2,30 @@ package com.zerobase.reservation.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+import static org.springframework.http.HttpStatus.*;
 
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
 
-    USER_NOT_FOUND("사용자가 없습니다."),
-    ALREADY_EXIST_RESTAURANT("이미 존재하는 음식점입니다."),
-    DO_NOT_EXIST_RESTAURANT("존재하지 않는 음식점입니다."),
-    DO_NOT_EXIST_RESERVATION("예약 정보가 존재하지 않습니다."),
-    RESERVATION_TIME_OVER("예약 시간이 지났습니다."),
-    DO_NOT_CHECKED_VISITED("방문 확인이 되지 않았습니다."),
-    DO_NOT_CONFIRMED("예약확정이 되지 않았습니다."),
-    USER_NOT_PARTNER("파트너 미가입 회원입니다."),
-    INVALID_REQUEST("잘못된 요청입니다."),
-    EXPIRED_TOKEN("인증 토큰이 만료되었습니다.");
+    /* user */
+    USER_NOT_FOUND("사용자가 없습니다.", NOT_FOUND),
+    /* restaurant */
+    ALREADY_EXIST_RESTAURANT("이미 존재하는 음식점입니다.", BAD_REQUEST),
+    DO_NOT_EXIST_RESTAURANT("존재하지 않는 음식점입니다.", NOT_FOUND),
+    /* reservation */
+    DO_NOT_EXIST_RESERVATION("예약 정보가 존재하지 않습니다.", NOT_FOUND),
+    RESERVATION_TIME_OVER("예약 시간이 지났습니다.", BAD_REQUEST),
+    DO_NOT_CHECKED_VISITED("방문 확인이 되지 않았습니다.", BAD_REQUEST),
+    DO_NOT_CONFIRMED("예약확정이 되지 않았습니다.", BAD_REQUEST),
+    /* partner */
+    USER_NOT_PARTNER("파트너 미가입 회원입니다.", BAD_REQUEST),
+    /* else */
+    INVALID_REQUEST("잘못된 요청입니다.", BAD_REQUEST),
+    EXPIRED_TOKEN("인증 토큰이 만료되었습니다.", UNAUTHORIZED);
 
     private final String description;
+    private final HttpStatus status;
 }

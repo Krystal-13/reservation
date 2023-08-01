@@ -1,9 +1,7 @@
 package com.zerobase.reservation.security;
 
-import com.zerobase.reservation.exception.CustomException;
 import com.zerobase.reservation.user.type.Role;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
-
-import static com.zerobase.reservation.exception.ErrorCode.EXPIRED_TOKEN;
 
 @Component
 @RequiredArgsConstructor
@@ -63,17 +58,12 @@ public class TokenProvider {
 
     private Claims parseClaims(String token) {
 
-        try {
-            return Jwts.parser().setSigningKey(this.secretKey)
+        return Jwts.parser().setSigningKey(this.secretKey)
                                 .parseClaimsJws(token).getBody();
-        } catch (ExpiredJwtException e) {
-            throw new CustomException(EXPIRED_TOKEN);
-        }
 
     }
 
     public boolean validateToken(String token) {
-        if (!StringUtils.hasText(token)) return false;
 
         Claims claims = this.parseClaims(token);
         return !claims.getExpiration().before(new Date());
