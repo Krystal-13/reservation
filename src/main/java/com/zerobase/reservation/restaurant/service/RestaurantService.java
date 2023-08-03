@@ -10,7 +10,7 @@ public interface RestaurantService {
 
     RestaurantDto register(RestaurantDto restaurantDto, String userEmail);
 
-    boolean isPartner(Long userId);
+    boolean isPartner(String email);
 
     Page<RestaurantDto> findAllRestaurant(Pageable pageable);
 
@@ -19,4 +19,8 @@ public interface RestaurantService {
     List<RestaurantDto> findByCategory(String category);
 
     RestaurantDto getRestaurantDetail(Long restaurantId);
+
+    RestaurantDto modify(RestaurantDto restaurantDto);
+
+    boolean delete(Long restaurantId);
 }

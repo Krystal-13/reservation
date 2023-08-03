@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * RequestMapping("/reservation") : 기본적으로 레스토랑 검색은 누구나 가능,
+ * GetMapping("/detail/{restaurantId}") : 예약하기는 회원가입이 되어야 가능,
+ * PutMapping("/manage") : 예약상태를 변경하기는 MANAGER 권한만 가능
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reservation")
@@ -64,9 +69,9 @@ public class ReservationController {
 
     @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/manage")
-    public ResponseEntity<?> updateState(@RequestBody ReservationDto request) {
+    public ResponseEntity<?> updateState(@RequestParam Long reservationId, @RequestBody String state) {
 
-        ReservationDto reservation = reservationService.updateReservationState(request);
+        ReservationDto reservation = reservationService.updateReservationState(reservationId, state);
 
         return ResponseEntity.ok(reservation);
     }

@@ -1,6 +1,6 @@
 package com.zerobase.reservation.security;
 
-import com.zerobase.reservation.user.type.Role;
+import com.zerobase.reservation.user.entity.type.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

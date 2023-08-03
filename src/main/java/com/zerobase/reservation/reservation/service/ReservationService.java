@@ -1,19 +1,19 @@
 package com.zerobase.reservation.reservation.service;
 
 import com.zerobase.reservation.reservation.dto.ReservationDto;
-import com.zerobase.reservation.restaurant.review.entity.Review;
-import com.zerobase.reservation.user.dto.UserDto;
 
 import java.util.List;
 
 public interface ReservationService {
     ReservationDto reserve(Long restaurantId, ReservationDto request);
 
-    List<ReservationDto> getMyReservation(UserDto request);
+    List<ReservationDto> getMyReservation(String email);
 
-    ReservationDto checkIn(ReservationDto request);
+    ReservationDto checkIn(Long reservationId);
 
-    ReservationDto review(Review request);
+    ReservationDto review(String email, Long restaurantId, String reviewText);
 
-    ReservationDto updateReservationState(ReservationDto request);
+    ReservationDto updateReservationState(Long reservationId, String state);
+
+    boolean cancel(Long reservationId);
 }

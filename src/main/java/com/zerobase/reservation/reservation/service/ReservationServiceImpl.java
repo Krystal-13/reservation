@@ -4,16 +4,16 @@ import com.zerobase.reservation.exception.CustomException;
 import com.zerobase.reservation.exception.ErrorCode;
 import com.zerobase.reservation.reservation.dto.ReservationDto;
 import com.zerobase.reservation.reservation.entity.Reservation;
+import com.zerobase.reservation.reservation.entity.type.State;
 import com.zerobase.reservation.reservation.repository.ReservationRepository;
-import com.zerobase.reservation.reservation.type.State;
 import com.zerobase.reservation.restaurant.entity.Restaurant;
+import com.zerobase.reservation.restaurant.entity.Review;
 import com.zerobase.reservation.restaurant.repository.RestaurantRepository;
-import com.zerobase.reservation.restaurant.review.entity.Review;
-import com.zerobase.reservation.restaurant.review.repository.ReviewRepository;
-import com.zerobase.reservation.user.dto.UserDto;
+import com.zerobase.reservation.restaurant.repository.ReviewRepository;
 import com.zerobase.reservation.user.entity.User;
 import com.zerobase.reservation.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService{
 
@@ -30,6 +31,10 @@ public class ReservationServiceImpl implements ReservationService{
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
 
+
+    /**
+     * 예약하기 (상태 : 요청)
+     */
     @Override
     public ReservationDto reserve(Long restaurantId, ReservationDto request) {
 
@@ -42,8 +47,6 @@ public class ReservationServiceImpl implements ReservationService{
                 .phone(request.getPhone())
                 .specialRequest(request.getSpecialRequest())
                 .restaurantId(restaurantId)
-                .userId(request.getUserId())
-                .visited(false)
                 .state(State.REQUEST)
                 .build();
         reservationRepository.save(reservation);
@@ -51,17 +54,25 @@ public class ReservationServiceImpl implements ReservationService{
         return ReservationDto.of(reservation);
     }
 
+    /**
+     * 로그인해서 마이페이지의 나의 예약 목록을 가져오는 기능
+     */
     @Override
-    public List<ReservationDto> getMyReservation(UserDto request) {
+    public List<ReservationDto> getMyReservation(String email) {
 
-        return reservationRepository.findAllByUserId(request.getId());
+        List<Reservation> reservations = reservationRepository.findAllByUserEmail(email);
+
+        return ReservationDto.of(reservations);
     }
 
+    /**
+     * ( 예약상태 : 승인 ) 이여야만 키오스크에서 예약번호로 체크인, 예약시간 10분전까지만 체크인 가능
+     */
     @Override
-    public ReservationDto checkIn(ReservationDto request) {
+    public ReservationDto checkIn(Long reservationId) {
 
         Optional<Reservation> optionalReservation =
-                reservationRepository.findById(request.getId());
+                reservationRepository.findById(reservationId);
 
         if (optionalReservation.isEmpty()) {
             throw new CustomException(ErrorCode.DO_NOT_EXIST_RESERVATION);
@@ -83,24 +94,28 @@ public class ReservationServiceImpl implements ReservationService{
         return ReservationDto.of(reservation);
     }
 
+
+    /**
+     * 방문 후 리뷰쓰기 기능
+     */
     @Override
-    public ReservationDto review(Review request) {
+    public ReservationDto review(String email, Long restaurantId, String reviewText) {
 
         Optional<Reservation> optionalReservation =
-                reservationRepository.findByUserIdAndRestaurantIdAndVisitedTrue(
-                                            request.getUserId(), request.getRestaurantId());
+                reservationRepository.findByUserEmailAndRestaurantIdAndVisitedTrue(
+                                            email, restaurantId);
 
         if (optionalReservation.isEmpty()) {
             throw new CustomException(ErrorCode.DO_NOT_EXIST_RESERVATION);
         }
 
-        Optional<Restaurant> optionalRestaurant = restaurantRepository.findById(request.getRestaurantId());
+        Optional<Restaurant> optionalRestaurant = restaurantRepository.findById(restaurantId);
 
         if (optionalRestaurant.isEmpty()) {
             throw new CustomException(ErrorCode.DO_NOT_EXIST_RESTAURANT);
         }
 
-        Optional<User> optionalUser = userRepository.findById(request.getUserId());
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -109,11 +124,11 @@ public class ReservationServiceImpl implements ReservationService{
         User user = optionalUser.get();
 
         Review review = Review.builder()
-                .userId(request.getId())
+                .userId(user.getId())
                 .username(user.getUsername())
                 .regDt(LocalDateTime.now())
-                .restaurantId(request.getRestaurantId())
-                .review(request.getReview())
+                .restaurantId(restaurantId)
+                .review(reviewText)
                 .build();
         reviewRepository.save(review);
 
@@ -124,19 +139,46 @@ public class ReservationServiceImpl implements ReservationService{
         return ReservationDto.of(optionalReservation.get());
     }
 
+    /**
+     * 예약이 들어오면 MANAGER 가 ( 예약상태 : 승인/취소 ) 할 수 있는 기능
+     */
     @Override
-    public ReservationDto updateReservationState(ReservationDto request) {
+    public ReservationDto updateReservationState(Long reservationId, String state) {
 
-        Optional<Reservation> optionalReservation = reservationRepository.findById(request.getId());
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
 
         if (optionalReservation.isEmpty()) {
             throw new CustomException(ErrorCode.DO_NOT_EXIST_RESERVATION);
         }
 
         Reservation reservation = optionalReservation.get();
-        reservation.setState(request.getState());
+        reservation.setState(State.get(state));
         reservationRepository.save(reservation);
 
         return ReservationDto.of(reservation);
+    }
+
+    /**
+     * User 가 방문하기 전 예약을 취소할 수 있는 기능
+     */
+    @Override
+    public boolean cancel(Long reservationId) {
+
+        Optional<Reservation> optionalReservation =
+                reservationRepository.findById(reservationId);
+
+        if (optionalReservation.isEmpty()) {
+            throw new CustomException(ErrorCode.DO_NOT_EXIST_RESERVATION);
+        }
+
+        Reservation reservation = optionalReservation.get();
+
+        if (reservation.isVisited()) {
+            return false;
+        }
+
+        reservationRepository.deleteById(reservationId);
+
+        return true;
     }
 }

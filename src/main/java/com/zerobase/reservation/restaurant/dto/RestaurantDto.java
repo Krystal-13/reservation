@@ -1,9 +1,9 @@
 package com.zerobase.reservation.restaurant.dto;
 
 import com.zerobase.reservation.restaurant.entity.Restaurant;
-import com.zerobase.reservation.restaurant.review.entity.Review;
+import com.zerobase.reservation.restaurant.entity.Review;
 import lombok.*;
-import com.zerobase.reservation.restaurant.menu.entity.Menu;
+import com.zerobase.reservation.restaurant.entity.Menu;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
@@ -28,7 +28,7 @@ public class RestaurantDto {
     private LocalTime close;
 
     private Long userId;
-    private List<Review> reviews;
+    private List<ReviewDto> reviews;
 
     private String category;
 
@@ -41,7 +41,7 @@ public class RestaurantDto {
                 .open(restaurant.getOpen())
                 .close(restaurant.getClose())
                 .userId(restaurant.getUserId())
-                .reviews(restaurant.getReviews())
+                .reviews(RestaurantDto.getOnlyReview(restaurant.getReviews()))
                 .category(restaurant.getCategory())
                 .build();
     }
@@ -58,6 +58,26 @@ public class RestaurantDto {
         }
         return restaurantDtoList;
 
+    }
+
+    /**
+     * Review class 중에서 Model 에 내려줄 username, review, regDt 만 추출
+     */
+    public static List<ReviewDto> getOnlyReview(List<Review> reviews) {
+        if (reviews == null) {
+            return null;
+        }
+
+        List<ReviewDto> reviewList = new ArrayList<>();
+        for(Review x : reviews) {
+            ReviewDto reviewDto = ReviewDto.builder()
+                    .username(x.getUsername())
+                    .review(x.getReview())
+                    .regDt(x.getRegDt())
+                    .build();
+            reviewList.add(reviewDto);
+        }
+        return reviewList;
     }
 
 }

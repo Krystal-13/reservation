@@ -1,8 +1,8 @@
 package com.zerobase.reservation.restaurant.entity;
 
-import com.zerobase.reservation.restaurant.menu.entity.Menu;
-import com.zerobase.reservation.restaurant.review.entity.Review;
+import com.zerobase.reservation.user.entity.BaseEntity;
 import lombok.*;
+import org.hibernate.envers.AuditOverride;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -15,7 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Restaurant {
+@AuditOverride(forClass = BaseEntity.class)
+public class Restaurant extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

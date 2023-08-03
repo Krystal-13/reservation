@@ -1,4 +1,4 @@
-package com.zerobase.reservation.restaurant.review.entity;
+package com.zerobase.reservation.restaurant.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +24,7 @@ public class Review {
     private String username;
     private String review;
     private LocalDateTime regDt;
+    @Column(name = "restaurant_id")
     private Long restaurantId;
 
 }

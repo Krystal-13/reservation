@@ -24,9 +24,6 @@ public class UserDetailServiceComponent implements UserDetailsService {
         User user = this.userRepository.findByEmail(username)
                 .orElseThrow(RuntimeException::new);
 
-        log.info("Success find member {}", user);
-
-        //todo no user exception
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(passwordEncoder.encode(user.getPassword()))

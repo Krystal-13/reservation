@@ -1,9 +1,9 @@
-package com.zerobase.reservation.restaurant.menu;
+package com.zerobase.reservation.restaurant;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zerobase.reservation.restaurant.menu.entity.Menu;
+import com.zerobase.reservation.restaurant.entity.Menu;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MenuListToJsonConverter implements AttributeConverter<List<Menu>, String> {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public String convertToDatabaseColumn(List<Menu> attribute) {
         try {
@@ -26,7 +26,7 @@ public class MenuListToJsonConverter implements AttributeConverter<List<Menu>, S
 
     @Override
     public List<Menu> convertToEntityAttribute(String dbData) {
-        TypeReference<List<Menu>> typeReference = new TypeReference<List<Menu>>() {};
+        TypeReference<List<Menu>> typeReference = new TypeReference<>() {};
         try {
             return objectMapper.readValue(dbData, typeReference);
         } catch (JsonProcessingException e) {

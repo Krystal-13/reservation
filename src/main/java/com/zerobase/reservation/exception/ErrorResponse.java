@@ -1,6 +1,7 @@
 package com.zerobase.reservation.exception;
 
 import lombok.*;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
@@ -10,5 +11,5 @@ import lombok.*;
 public class ErrorResponse {
     private ErrorCode errorCode;
     private String errorMessage;
-    private Integer status;
+    private HttpStatus status;
 }

@@ -1,23 +1,24 @@
 package com.zerobase.reservation.reservation.entity;
 
-import com.zerobase.reservation.reservation.type.State;
+import com.zerobase.reservation.reservation.entity.type.State;
+import com.zerobase.reservation.user.entity.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.envers.AuditOverride;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
+@Table(name = "reservation")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reservation {
+@AuditOverride(forClass = BaseEntity.class)
+public class Reservation extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -32,10 +33,10 @@ public class Reservation {
     String userEmail;
     String phone;
     String specialRequest;
-    Long restaurantId;
-    Long userId;
 
-    boolean visited;
+    Long restaurantId;
+
+    boolean visited = false;
     State state;
 
 }

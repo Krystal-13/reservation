@@ -1,9 +1,11 @@
 package com.zerobase.reservation.user.service;
 
+import com.zerobase.reservation.exception.CustomException;
+import com.zerobase.reservation.exception.ErrorCode;
 import com.zerobase.reservation.user.entity.User;
 import com.zerobase.reservation.user.dto.UserDto;
 import com.zerobase.reservation.user.repository.UserRepository;
-import com.zerobase.reservation.user.type.Role;
+import com.zerobase.reservation.user.entity.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,13 +17,19 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    /**
+     * 회원가입
+     * 폼을 UserDto 로 받아서 사용
+     * 비밀번호 암호화
+     */
     @Override
-    public UserDto register(UserDto request) {
+    public String register(UserDto request) {
 
         boolean requestUser = userRepository.existsByEmail(request.getEmail());
 
         if (requestUser) {
-            // todo exception ( alread exist user )
+            throw new CustomException(ErrorCode.ALREADY_REGISTERED_USER);
         }
 
         String encPassword =
@@ -35,17 +43,20 @@ public class UserServiceImpl implements UserService{
                 .build();
         userRepository.save(user);
 
-        return UserDto.of(user);
+        return "회원가입이 완료되었습니다!";
     }
 
+    /**
+     * 로그인
+     */
     @Override
     public UserDto authenticate(UserDto request) {
-        // 인증키 발급이 되어야 (로그인이 되어야) 예약가능
+
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("error class 만들기!!!!!!!"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (!this.passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            //todo throw new IncorrectPasswordException();
+            throw new CustomException(ErrorCode.UNMATCHED_INFORMATION);
         }
 
         return UserDto.of(user);

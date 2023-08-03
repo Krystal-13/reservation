@@ -1,4 +1,4 @@
-package com.zerobase.reservation.restaurant.entity;
+package com.zerobase.reservation.restaurant.entity.type;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -10,7 +10,7 @@ public enum Category {
     WesternFood("양식"),
     AsianFood("아시아식"),
     FastFood("패스트푸드"),
-    FamilyRestaurant("패밀리레스토랑"),
+    Restaurant("레스토랑"),
     CafeOrBakery("카페/베이커리");
 
     private final String name;
@@ -20,7 +20,7 @@ public enum Category {
     }
 
     public static String getCategory(String name) {
-        for (var c : Category.values()) {
+        for (Category c : Category.values()) {
             if (c.name.equals(name)) {
                 return c.name;
             }

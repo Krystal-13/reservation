@@ -22,14 +22,14 @@ public class AuthController {
     private final TokenProvider tokenProvider;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody UserDto request) {
-        UserDto user = userService.register(request);
+    public ResponseEntity<String> signup(@RequestBody UserDto request) {
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.register(request));
     }
 
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestBody UserDto request) {
+
         UserDto user = userService.authenticate(request);
         String token = tokenProvider
                 .generateToken(user.getEmail(), user.getRoles());

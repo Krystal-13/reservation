@@ -1,7 +1,6 @@
 package com.zerobase.reservation.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zerobase.reservation.exception.CustomException;
 import com.zerobase.reservation.exception.ErrorCode;
 import com.zerobase.reservation.exception.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -44,23 +43,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
 
-            if (!StringUtils.hasText(token)) {
-                throw new CustomException(ErrorCode.INVALID_REQUEST);
-            }
-
             if (StringUtils.hasText(token) && this.tokenProvider.validateToken(token)) {
                 Authentication auth = this.tokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
+
             filterChain.doFilter(request, response);
 
         } catch (MalformedJwtException | UnsupportedJwtException | SignatureException e) {
             sendErrorResponse(response, "지원하지 않는 토큰입니다.");
         } catch (ExpiredJwtException e) {
             sendErrorResponse(response, "만료된 토큰입니다.");
-        } catch (CustomException e) {
-            sendErrorResponse(response, "토큰 값이 없습니다.");
         }
+
     }
 
     private String resolveTokenFromRequest(HttpServletRequest request) {
@@ -73,6 +68,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
+    /**
+     * Filter 단계에서 내려주는 에러응답
+     */
     private void sendErrorResponse(HttpServletResponse response, String message) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         response.setCharacterEncoding("utf-8");
@@ -81,9 +79,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.getWriter().write(objectMapper
                                     .writeValueAsString(ErrorResponse.builder()
                                                                     .errorCode(ErrorCode.INVALID_REQUEST)
-                                                                    .status(HttpStatus.UNAUTHORIZED.value())
+                                                                    .status(HttpStatus.UNAUTHORIZED)
                                                                     .errorMessage(message)
                                                                     .build()));
 
-}
+    }
 }

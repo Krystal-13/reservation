@@ -1,10 +1,11 @@
 package com.zerobase.reservation.user.entity;
 
-import com.zerobase.reservation.user.type.Role;
+import com.zerobase.reservation.user.entity.type.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.envers.AuditOverride;
 
 import javax.persistence.*;
 
@@ -14,7 +15,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class User {
+@AuditOverride(forClass = BaseEntity.class)
+public class User extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

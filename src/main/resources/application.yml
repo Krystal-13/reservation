@@ -4,16 +4,15 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
-      use-new-id-generator-mappings: false
+      ddl-auto: update
     show-sql: true
     defer-datasource-initialization: true
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/reservation?serverTimezone=UTC&characterEncoding=UTF-8
-    username: root
-    password: reservation
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASS}
 
   jwt:
     secret: ${SECRET_KEY}

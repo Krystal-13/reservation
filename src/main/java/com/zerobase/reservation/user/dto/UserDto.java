@@ -1,7 +1,7 @@
 package com.zerobase.reservation.user.dto;
 
 import com.zerobase.reservation.user.entity.User;
-import com.zerobase.reservation.user.type.Role;
+import com.zerobase.reservation.user.entity.type.Role;
 import lombok.*;
 
 @Getter

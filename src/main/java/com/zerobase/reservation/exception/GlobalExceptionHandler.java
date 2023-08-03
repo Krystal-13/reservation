@@ -1,7 +1,6 @@
 package com.zerobase.reservation.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,9 +18,10 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(e.getErrorCode())
                 .errorMessage(e.getErrorMessage())
+                .status(e.getErrorCode().getStatus())
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(errorResponse.getErrorCode().getStatus().value()));
+        return new ResponseEntity<>(errorResponse, e.getErrorCode().getStatus());
     }
 
 }

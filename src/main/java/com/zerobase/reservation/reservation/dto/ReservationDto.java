@@ -1,7 +1,7 @@
 package com.zerobase.reservation.reservation.dto;
 
 import com.zerobase.reservation.reservation.entity.Reservation;
-import com.zerobase.reservation.reservation.type.State;
+import com.zerobase.reservation.reservation.entity.type.State;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +10,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder
@@ -28,7 +30,6 @@ public class ReservationDto {
     String phone;
     String specialRequest;
     Long restaurantId;
-    Long userId;
     boolean visited;
     State state;
 
@@ -42,9 +43,21 @@ public class ReservationDto {
                 .phone(reservation.getPhone())
                 .specialRequest(reservation.getSpecialRequest())
                 .restaurantId(reservation.getRestaurantId())
-                .userId(reservation.getUserId())
                 .visited(reservation.isVisited())
                 .state(reservation.getState())
                 .build();
+    }
+
+    public static List<ReservationDto> of(List<Reservation> reservationList) {
+        if (reservationList == null) {
+            return  null;
+        }
+
+        List<ReservationDto> reservations = new ArrayList<>();
+        for (Reservation r : reservationList) {
+            reservations.add(ReservationDto.of(r));
+        }
+
+        return reservations;
     }
 }
