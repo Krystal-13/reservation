@@ -72,6 +72,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * Filter 단계에서 내려주는 에러응답
      */
     private void sendErrorResponse(HttpServletResponse response, String message) throws IOException {
+
+        log.error("{} errorResponse : {}", getClass(), message);
+
         ObjectMapper objectMapper = new ObjectMapper();
         response.setCharacterEncoding("utf-8");
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -79,7 +82,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.getWriter().write(objectMapper
                                     .writeValueAsString(ErrorResponse.builder()
                                                                     .errorCode(ErrorCode.INVALID_REQUEST)
-                                                                    .status(HttpStatus.UNAUTHORIZED)
                                                                     .errorMessage(message)
                                                                     .build()));
 

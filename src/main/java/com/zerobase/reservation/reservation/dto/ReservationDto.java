@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -50,7 +51,7 @@ public class ReservationDto {
 
     public static List<ReservationDto> of(List<Reservation> reservationList) {
         if (reservationList == null) {
-            return  null;
+            return Collections.emptyList();
         }
 
         List<ReservationDto> reservations = new ArrayList<>();

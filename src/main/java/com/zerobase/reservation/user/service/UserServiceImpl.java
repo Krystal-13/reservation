@@ -1,15 +1,16 @@
 package com.zerobase.reservation.user.service;
 
 import com.zerobase.reservation.exception.CustomException;
-import com.zerobase.reservation.exception.ErrorCode;
-import com.zerobase.reservation.user.entity.User;
 import com.zerobase.reservation.user.dto.UserDto;
-import com.zerobase.reservation.user.repository.UserRepository;
+import com.zerobase.reservation.user.entity.User;
 import com.zerobase.reservation.user.entity.type.Role;
+import com.zerobase.reservation.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import static com.zerobase.reservation.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService{
         boolean requestUser = userRepository.existsByEmail(request.getEmail());
 
         if (requestUser) {
-            throw new CustomException(ErrorCode.ALREADY_REGISTERED_USER);
+            throw new CustomException(ALREADY_REGISTERED_USER);
         }
 
         String encPassword =
@@ -53,10 +54,10 @@ public class UserServiceImpl implements UserService{
     public UserDto authenticate(UserDto request) {
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         if (!this.passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new CustomException(ErrorCode.UNMATCHED_INFORMATION);
+            throw new CustomException(UNMATCHED_INFORMATION);
         }
 
         return UserDto.of(user);

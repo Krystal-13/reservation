@@ -19,7 +19,8 @@ public class UserController {
     @PostMapping("/my")
     public ResponseEntity<?> myReservation(Principal principal) {
 
-        List<ReservationDto> myReservation = reservationService.getMyReservation(principal.getName());
+        List<ReservationDto> myReservation =
+                    reservationService.getMyReservation(principal.getName());
 
         return ResponseEntity.ok(myReservation);
     }
@@ -41,9 +42,12 @@ public class UserController {
     }
 
     @PostMapping("/my/review")
-    public ResponseEntity<?> review(Principal principal, @RequestParam Long restaurantId, @RequestBody String reviewText) {
+    public ResponseEntity<?> review(Principal principal,
+                                    @RequestParam Long restaurantId,
+                                    @RequestBody String reviewText) {
 
-        ReservationDto myReservation = reservationService.review(principal.getName(), restaurantId, reviewText);
+        ReservationDto myReservation =
+                reservationService.review(principal.getName(), restaurantId, reviewText);
 
         return ResponseEntity.ok(myReservation);
     }

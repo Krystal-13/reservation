@@ -3,26 +3,27 @@ package com.zerobase.reservation.restaurant.service;
 import com.zerobase.reservation.exception.CustomException;
 import com.zerobase.reservation.reservation.entity.Reservation;
 import com.zerobase.reservation.reservation.repository.ReservationRepository;
+import com.zerobase.reservation.restaurant.dto.RestaurantDto;
 import com.zerobase.reservation.restaurant.entity.Menu;
+import com.zerobase.reservation.restaurant.entity.Restaurant;
 import com.zerobase.reservation.restaurant.entity.type.Category;
 import com.zerobase.reservation.restaurant.repository.MenuRepository;
-import com.zerobase.reservation.restaurant.dto.RestaurantDto;
-import com.zerobase.reservation.restaurant.entity.Restaurant;
 import com.zerobase.reservation.restaurant.repository.RestaurantRepository;
 import com.zerobase.reservation.restaurant.repository.ReviewRepository;
 import com.zerobase.reservation.user.entity.User;
 import com.zerobase.reservation.user.repository.UserRepository;
-import com.zerobase.reservation.user.entity.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static com.zerobase.reservation.exception.ErrorCode.*;
+import static com.zerobase.reservation.user.entity.type.Role.MANAGER;
 
 @Service
 @RequiredArgsConstructor
@@ -48,9 +49,7 @@ public class RestaurantServiceImpl implements RestaurantService{
         }
 
         User user = optionalUser.get();
-        if (!user.getRoles().equals(Role.MANAGER)) {
-            throw new CustomException(USER_NOT_PARTNER);
-        }
+        this.isPartner(user.getEmail());
 
         Optional<Restaurant> optionalRestaurant =
                         restaurantRepository.findByAddress(restaurantDto.getAddress());
@@ -98,7 +97,7 @@ public class RestaurantServiceImpl implements RestaurantService{
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        if (!Role.MANAGER.equals(user.getRoles())) {
+        if (!MANAGER.equals(user.getRoles())) {
             throw new CustomException(USER_NOT_PARTNER);
         }
 
@@ -106,27 +105,27 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public Page<RestaurantDto> findAllRestaurant(Pageable pageable) {
+    public Page<RestaurantDto> getRestaurantList(Pageable pageable) {
 
         return restaurantRepository.findAll(pageable).map(RestaurantDto::of);
     }
 
     @Override
-    public List<RestaurantDto> findByRestaurantName(String restaurantName) {
+    public List<RestaurantDto> getListByRestaurantName(String restaurantName) {
 
-        Optional<List<Restaurant>> optionalRestaurants =
+        List<Restaurant> restaurants =
                 restaurantRepository.findByRestaurantName(restaurantName);
 
-        return optionalRestaurants.map(RestaurantDto::of).orElse(null);
+        return RestaurantDto.of(restaurants);
     }
 
     @Override
-    public List<RestaurantDto> findByCategory(String category) {
+    public List<RestaurantDto> getListByCategory(String category) {
 
-        Optional<List<Restaurant>> optionalRestaurants =
+        List<Restaurant> restaurants =
                 restaurantRepository.findByCategory(category);
 
-        return optionalRestaurants.map(RestaurantDto::of).orElse(null);
+        return RestaurantDto.of(restaurants);
     }
 
     @Override
@@ -175,6 +174,7 @@ public class RestaurantServiceImpl implements RestaurantService{
      * 레스토랑 삭제, 아직 방문하지 않은 예약확정건이 있으면 삭제 불가
      */
     @Override
+    @Transactional
     public boolean delete(Long restaurantId) {
 
         Optional<Restaurant> optionalRestaurant =
@@ -184,7 +184,8 @@ public class RestaurantServiceImpl implements RestaurantService{
             throw new CustomException(DO_NOT_EXIST_RESTAURANT);
         }
 
-        List<Reservation> reservationList = reservationRepository.findAllByRestaurantIdAndVisitedFalse(restaurantId);
+        List<Reservation> reservationList =
+                reservationRepository.findAllByRestaurantIdAndVisitedFalse(restaurantId);
 
         if (reservationList.size() > 0) {
             throw new CustomException(EXIST_RESERVATION);
@@ -196,4 +197,5 @@ public class RestaurantServiceImpl implements RestaurantService{
 
         return true;
     }
+
 }

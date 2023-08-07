@@ -1,7 +1,6 @@
 package com.zerobase.reservation.reservation.service;
 
 import com.zerobase.reservation.exception.CustomException;
-import com.zerobase.reservation.exception.ErrorCode;
 import com.zerobase.reservation.reservation.dto.ReservationDto;
 import com.zerobase.reservation.reservation.entity.Reservation;
 import com.zerobase.reservation.reservation.entity.type.State;
@@ -20,6 +19,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+
+import static com.zerobase.reservation.exception.ErrorCode.*;
+import static com.zerobase.reservation.reservation.entity.type.State.CONFIRM;
 
 @Service
 @Slf4j
@@ -60,7 +62,8 @@ public class ReservationServiceImpl implements ReservationService{
     @Override
     public List<ReservationDto> getMyReservation(String email) {
 
-        List<Reservation> reservations = reservationRepository.findAllByUserEmail(email);
+        List<Reservation> reservations =
+                            reservationRepository.findAllByUserEmail(email);
 
         return ReservationDto.of(reservations);
     }
@@ -75,21 +78,24 @@ public class ReservationServiceImpl implements ReservationService{
                 reservationRepository.findById(reservationId);
 
         if (optionalReservation.isEmpty()) {
-            throw new CustomException(ErrorCode.DO_NOT_EXIST_RESERVATION);
+            throw new CustomException(DO_NOT_EXIST_RESERVATION);
         }
 
         Reservation reservation = optionalReservation.get();
 
-        if (!reservation.getState().equals(State.CONFIRM)) {
-            throw new CustomException(ErrorCode.DO_NOT_CONFIRMED);
+        if (!reservation.getState().equals(CONFIRM)) {
+            throw new CustomException(DO_NOT_CONFIRMED);
         }
 
-        if (reservation.getTime().minusMinutes(10).isBefore(LocalTime.now())) {
-            throw new CustomException(ErrorCode.RESERVATION_TIME_OVER);
+        if (reservation.getTime().minusMinutes(10)
+                                    .isBefore(LocalTime.now())) {
+            throw new CustomException(RESERVATION_TIME_OVER);
         }
 
         reservation.setVisited(true);
         reservationRepository.save(reservation);
+
+        log.info("{} checkIn", reservationId);
 
         return ReservationDto.of(reservation);
     }
@@ -106,19 +112,20 @@ public class ReservationServiceImpl implements ReservationService{
                                             email, restaurantId);
 
         if (optionalReservation.isEmpty()) {
-            throw new CustomException(ErrorCode.DO_NOT_EXIST_RESERVATION);
+            throw new CustomException(DO_NOT_EXIST_RESERVATION);
         }
 
-        Optional<Restaurant> optionalRestaurant = restaurantRepository.findById(restaurantId);
+        Optional<Restaurant> optionalRestaurant =
+                                    restaurantRepository.findById(restaurantId);
 
         if (optionalRestaurant.isEmpty()) {
-            throw new CustomException(ErrorCode.DO_NOT_EXIST_RESTAURANT);
+            throw new CustomException(DO_NOT_EXIST_RESTAURANT);
         }
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+            throw new CustomException(USER_NOT_FOUND);
         }
 
         User user = optionalUser.get();
@@ -145,15 +152,18 @@ public class ReservationServiceImpl implements ReservationService{
     @Override
     public ReservationDto updateReservationState(Long reservationId, String state) {
 
-        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
+        Optional<Reservation> optionalReservation =
+                                reservationRepository.findById(reservationId);
 
         if (optionalReservation.isEmpty()) {
-            throw new CustomException(ErrorCode.DO_NOT_EXIST_RESERVATION);
+            throw new CustomException(DO_NOT_EXIST_RESERVATION);
         }
 
         Reservation reservation = optionalReservation.get();
         reservation.setState(State.get(state));
         reservationRepository.save(reservation);
+
+        log.info("reservationId : {} - changed reservationState", reservationId);
 
         return ReservationDto.of(reservation);
     }
@@ -165,10 +175,10 @@ public class ReservationServiceImpl implements ReservationService{
     public boolean cancel(Long reservationId) {
 
         Optional<Reservation> optionalReservation =
-                reservationRepository.findById(reservationId);
+                            reservationRepository.findById(reservationId);
 
         if (optionalReservation.isEmpty()) {
-            throw new CustomException(ErrorCode.DO_NOT_EXIST_RESERVATION);
+            throw new CustomException(DO_NOT_EXIST_RESERVATION);
         }
 
         Reservation reservation = optionalReservation.get();

@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -49,7 +50,7 @@ public class RestaurantDto {
     public static List<RestaurantDto> of(List<Restaurant> restaurants) {
 
         if (restaurants == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         List<RestaurantDto> restaurantDtoList = new ArrayList<>();
@@ -65,7 +66,7 @@ public class RestaurantDto {
      */
     public static List<ReviewDto> getOnlyReview(List<Review> reviews) {
         if (reviews == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         List<ReviewDto> reviewList = new ArrayList<>();

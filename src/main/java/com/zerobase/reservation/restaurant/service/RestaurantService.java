@@ -12,11 +12,11 @@ public interface RestaurantService {
 
     boolean isPartner(String email);
 
-    Page<RestaurantDto> findAllRestaurant(Pageable pageable);
+    Page<RestaurantDto> getRestaurantList(Pageable pageable);
 
-    List<RestaurantDto> findByRestaurantName(String restaurantName);
+    List<RestaurantDto> getListByRestaurantName(String restaurantName);
 
-    List<RestaurantDto> findByCategory(String category);
+    List<RestaurantDto> getListByCategory(String category);
 
     RestaurantDto getRestaurantDetail(Long restaurantId);
 

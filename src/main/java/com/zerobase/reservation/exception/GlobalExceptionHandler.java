@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    /* ControllerAdvice는 Filter, Interceptor 단에서 발생하는 Exception은 처리를 해주지 못함. */
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<?> handleCustomException(CustomException e) {
@@ -18,7 +17,6 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(e.getErrorCode())
                 .errorMessage(e.getErrorMessage())
-                .status(e.getErrorCode().getStatus())
                 .build();
 
         return new ResponseEntity<>(errorResponse, e.getErrorCode().getStatus());

@@ -29,7 +29,7 @@ public class ReservationController {
     @GetMapping("/list")
     public ResponseEntity<?> searchAll(final Pageable pageable) {
 
-        Page<RestaurantDto> restaurants = restaurantService.findAllRestaurant(pageable);
+        Page<RestaurantDto> restaurants = restaurantService.getRestaurantList(pageable);
 
         return ResponseEntity.ok(restaurants);
     }
@@ -37,7 +37,7 @@ public class ReservationController {
     @GetMapping("/search/{restaurantName}")
     public ResponseEntity<?> searchByRestaurantName(@PathVariable String restaurantName) {
 
-        List<RestaurantDto> restaurants = restaurantService.findByRestaurantName(restaurantName);
+        List<RestaurantDto> restaurants = restaurantService.getListByRestaurantName(restaurantName);
 
         return ResponseEntity.ok(restaurants);
     }
@@ -45,7 +45,7 @@ public class ReservationController {
     @GetMapping("/search")
     public ResponseEntity<?> searchByCategory(@RequestParam String category) {
 
-        List<RestaurantDto> restaurants = restaurantService.findByCategory(category);
+        List<RestaurantDto> restaurants = restaurantService.getListByCategory(category);
 
         return ResponseEntity.ok(restaurants);
     }

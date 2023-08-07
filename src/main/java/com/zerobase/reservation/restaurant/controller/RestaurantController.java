@@ -24,9 +24,11 @@ public class RestaurantController {
         return ResponseEntity.ok(result);
     }
     @PostMapping("/register")
-    public ResponseEntity<?> registerSubmit(@RequestBody RestaurantDto restaurantDto, Principal principal) {
+    public ResponseEntity<?> registerSubmit(@RequestBody RestaurantDto restaurantDto,
+                                                            Principal principal) {
 
-        RestaurantDto restaurant = restaurantService.register(restaurantDto, principal.getName());
+        RestaurantDto restaurant =
+                restaurantService.register(restaurantDto, principal.getName());
 
         return ResponseEntity.ok(restaurant);
     }
