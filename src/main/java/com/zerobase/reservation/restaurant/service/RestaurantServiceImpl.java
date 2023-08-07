@@ -42,21 +42,13 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Override
     public RestaurantDto register(RestaurantDto restaurantDto, String userEmail) {
 
-        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
-
-        if (optionalUser.isEmpty()) {
-            throw new CustomException(USER_NOT_FOUND);
-        }
-
-        User user = optionalUser.get();
+        User user = userRepository.findByEmail(userEmail)
+                                    .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         this.isPartner(user.getEmail());
 
-        Optional<Restaurant> optionalRestaurant =
-                        restaurantRepository.findByAddress(restaurantDto.getAddress());
+        restaurantRepository.findByAddress(restaurantDto.getAddress())
+                            .orElseThrow(() -> new CustomException(ALREADY_EXIST_RESTAURANT));
 
-        if (optionalRestaurant.isPresent()) {
-            throw new CustomException(ALREADY_EXIST_RESTAURANT);
-        }
 
         List<Menu> list = new ArrayList<>(restaurantDto.getMenulist());
 
@@ -144,14 +136,9 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Override
     public RestaurantDto modify(RestaurantDto restaurantDto) {
 
-        Optional<Restaurant> optionalRestaurant =
-                restaurantRepository.findById(restaurantDto.getId());
-
-        if (optionalRestaurant.isEmpty()) {
-            throw new CustomException(DO_NOT_EXIST_RESTAURANT);
-        }
-
-        Restaurant restaurantDetail = optionalRestaurant.get();
+        Restaurant restaurantDetail = restaurantRepository
+                                        .findById(restaurantDto.getId()).orElseThrow(() ->
+                                            new CustomException(DO_NOT_EXIST_RESTAURANT));
         List<Menu> list = new ArrayList<>(restaurantDto.getMenulist());
 
         restaurantDetail.setRestaurantName(restaurantDto.getRestaurantName());
@@ -177,12 +164,8 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Transactional
     public boolean delete(Long restaurantId) {
 
-        Optional<Restaurant> optionalRestaurant =
-                restaurantRepository.findById(restaurantId);
-
-        if (optionalRestaurant.isEmpty()) {
-            throw new CustomException(DO_NOT_EXIST_RESTAURANT);
-        }
+        restaurantRepository.findById(restaurantId)
+                            .orElseThrow(() -> new CustomException(DO_NOT_EXIST_RESTAURANT));
 
         List<Reservation> reservationList =
                 reservationRepository.findAllByRestaurantIdAndVisitedFalse(restaurantId);

@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 import static com.zerobase.reservation.exception.ErrorCode.*;
 import static com.zerobase.reservation.reservation.entity.type.State.CONFIRM;
@@ -74,14 +73,9 @@ public class ReservationServiceImpl implements ReservationService{
     @Override
     public ReservationDto checkIn(Long reservationId) {
 
-        Optional<Reservation> optionalReservation =
-                reservationRepository.findById(reservationId);
-
-        if (optionalReservation.isEmpty()) {
-            throw new CustomException(DO_NOT_EXIST_RESERVATION);
-        }
-
-        Reservation reservation = optionalReservation.get();
+        Reservation reservation = reservationRepository
+                                    .findById(reservationId).orElseThrow(() ->
+                                        new CustomException(DO_NOT_EXIST_RESERVATION));
 
         if (!reservation.getState().equals(CONFIRM)) {
             throw new CustomException(DO_NOT_CONFIRMED);
@@ -107,28 +101,17 @@ public class ReservationServiceImpl implements ReservationService{
     @Override
     public ReservationDto review(String email, Long restaurantId, String reviewText) {
 
-        Optional<Reservation> optionalReservation =
-                reservationRepository.findByUserEmailAndRestaurantIdAndVisitedTrue(
-                                            email, restaurantId);
+        Reservation reservation = reservationRepository
+                                    .findByUserEmailAndRestaurantIdAndVisitedTrue(
+                                        email, restaurantId).orElseThrow(() ->
+                                            new CustomException(DO_NOT_EXIST_RESERVATION));
 
-        if (optionalReservation.isEmpty()) {
-            throw new CustomException(DO_NOT_EXIST_RESERVATION);
-        }
+        Restaurant restaurant = restaurantRepository
+                                    .findById(restaurantId).orElseThrow(() ->
+                                        new CustomException(DO_NOT_EXIST_RESTAURANT));
 
-        Optional<Restaurant> optionalRestaurant =
-                                    restaurantRepository.findById(restaurantId);
-
-        if (optionalRestaurant.isEmpty()) {
-            throw new CustomException(DO_NOT_EXIST_RESTAURANT);
-        }
-
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isEmpty()) {
-            throw new CustomException(USER_NOT_FOUND);
-        }
-
-        User user = optionalUser.get();
+        User user = userRepository.findByEmail(email)
+                                    .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         Review review = Review.builder()
                 .userId(user.getId())
@@ -139,27 +122,22 @@ public class ReservationServiceImpl implements ReservationService{
                 .build();
         reviewRepository.save(review);
 
-        Restaurant restaurant = optionalRestaurant.get();
         restaurant.getReviews().add(review);
         restaurantRepository.save(restaurant);
 
-        return ReservationDto.of(optionalReservation.get());
+        return ReservationDto.of(reservation);
     }
 
     /**
-     * 예약이 들어오면 MANAGER 가 ( 예약상태 : 승인/취소 ) 할 수 있는 기능
+     * 예약이 들어오면 MANAGER 가 ( 예약상태 : 승인/취소 ) 할 수 있는 기능,
      */
     @Override
     public ReservationDto updateReservationState(Long reservationId, String state) {
 
-        Optional<Reservation> optionalReservation =
-                                reservationRepository.findById(reservationId);
+        Reservation reservation = reservationRepository
+                                    .findById(reservationId).orElseThrow(() ->
+                                        new CustomException(DO_NOT_EXIST_RESERVATION));
 
-        if (optionalReservation.isEmpty()) {
-            throw new CustomException(DO_NOT_EXIST_RESERVATION);
-        }
-
-        Reservation reservation = optionalReservation.get();
         reservation.setState(State.get(state));
         reservationRepository.save(reservation);
 
@@ -174,20 +152,16 @@ public class ReservationServiceImpl implements ReservationService{
     @Override
     public boolean cancel(Long reservationId) {
 
-        Optional<Reservation> optionalReservation =
-                            reservationRepository.findById(reservationId);
-
-        if (optionalReservation.isEmpty()) {
-            throw new CustomException(DO_NOT_EXIST_RESERVATION);
-        }
-
-        Reservation reservation = optionalReservation.get();
+        Reservation reservation = reservationRepository
+                                    .findById(reservationId).orElseThrow(() ->
+                                        new CustomException(DO_NOT_EXIST_RESERVATION));
 
         if (reservation.isVisited()) {
             return false;
         }
 
-        reservationRepository.deleteById(reservationId);
+        reservation.setState(State.CANCEL);
+        reservationRepository.save(reservation);
 
         return true;
     }
